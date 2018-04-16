@@ -4,15 +4,12 @@ const route = require('express').Router()
  * Each todo would be of type - 
  * {task: 'some task', done: true}
  */
-let todos = [{id:0,task: 'Predefined Task',done:false,bchecked:false}];
+let todos = [{id:0,task: 'Predefined Task',done:false,bchecked:false},
+{id:1,task: 'new Predefined Task',done:false,bchecked:false}
 
-route.get('/', (req, res) => res.json(todos.map((t, i) =>
-    ({
-        id: i,
-        task: t.task,
-        done: t.done,
-        bchecked:t.bchecked
-    })
+];
+
+route.get('/', (req, res) => res.json(todos.filter(function(x){ return true}
 )))
 
 route.post('/', (req, res) => {
@@ -38,7 +35,8 @@ route.post('/', (req, res) => {
 route.get('/:id', (req, res) => res.json(todos[req.params.id]))
 
 route.delete('/:id', (req, res) => {
-    todos.splice(req.params.id, 1)
+    var index = todos.findIndex(x => x.id == req.params.id);
+       todos.splice(index,1);
     res.json({
         success: true,
         length: todos.length

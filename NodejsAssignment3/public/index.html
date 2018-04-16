@@ -7,7 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
 <script src="vue.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
@@ -58,50 +60,78 @@
 </div>
 
     <script>
+        
         let app = new Vue({
             el: '#app',
-            
+                
+
             data: {
-                newtask: '',
+                newtask: 'wfguewi',
                 done:false,
                 id:0,
                 bchecked:false,
                 todos:[]
-                //[
-                  //  {id:0,task: 'Predefined Task',done:false,bchecked:false}
-                //]
+
             },
-                
-                gettodo: axios.get('/todos', {
+
+                                             
+            methods: {
+                todo(){
+                   return  axios.get('/todos', { responseType:'json'
                                         
                     })
                     .then(function (response) {
-                                console.log(response.data[0].id);
+
+                             console.log(response.data);
+                             this.newtask =  "dwfwuefewofh"                            
+                             return response.data;
+
                      })
                      .catch(function (error) {
                             console.log(error);
                     })
-                ,            
-            methods: {
 
+                 }
+                ,  
                 addTodo () {
                     this.id = this.id + 1;
-                    this.todos.push({id:this.id,task: this.newtask, done:false,bchecked:false})
+                    var obj = {id:this.id,task: this.newtask, done:false,bchecked:false};
+                    this.todos.push(obj);
+                    axios.post('/todos', obj)
+                    .then(function (response) {
+                            console.log(response);
+                    })
+                    .catch(function (error) {
+                         console.log(error);
+                    });
+                    
                 },
                 checkMethod(tid){
                     var ele = document.getElementById(tid);
+                        var index = this.todos.findIndex(x => x.id == tid);
                     if(ele.checked == true){
-                        this.todos[tid].done =true;    
+
+                        this.todos[index].done =true;    
                     }
                     else {
-                        this.todos[tid].done =false;
+                        this.todos[index].done =false;
                     }
                      
                 },
                 clearTodo(){
                     for(var i = 0; i <  this.todos.length; i++){
+                        
                         if(this.todos[i].done == true){
+                            this.todos[i].done = false;
                             this.todos[i].bchecked = true;
+                            
+                            axios.delete('/todos/'+i, {})
+                            .then(function (response) {
+                                console.log(response);
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
                         }
                         else{
                             this.todos[i].bchecked = false;
@@ -110,14 +140,22 @@
                     //this.todos = this.todos;
                 }
                 
-            },
-            getTodo: function(){
-                    this.gettodo();
-                },
+            }
+
         })
+
+        $(document).ready(function() {
+                var r = app.todo();
+                setTimeout(function() {
+                  r.then(function(data){
+                   // console.log(data);
+                    app.todos = data;
+                    app.id =  data.length - 1;
+                  })   
+                }, 1000);
+                
+            });
     </script>
 </body>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
 </html>
